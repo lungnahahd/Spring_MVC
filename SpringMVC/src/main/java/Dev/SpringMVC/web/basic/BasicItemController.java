@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import Dev.SpringMVC.domain.item.Item;
 import Dev.SpringMVC.domain.item.ItemRepository;
@@ -50,9 +51,21 @@ public class BasicItemController
 	}
 	
 	@PostMapping("/add")
-	public String save() 
+	public String save(@RequestParam(value="itemName") String itemName,
+					   @RequestParam(value="price") Integer price,
+					   @RequestParam(value="quantity") Integer quantity,
+					   Model model) 
 	{
-		return "basic/addForm";
+		Item item = new Item();
+		item.setItemName(itemName);
+		item.setPrice(price);
+		item.setQuentity(quantity);
+		
+		itemRepository.save(item);
+		
+		model.addAttribute("item", item);
+		
+		return "basic/item";
 	}
 	
 	// 테스트 데이터 생성 
