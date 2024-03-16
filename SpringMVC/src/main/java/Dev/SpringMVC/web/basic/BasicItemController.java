@@ -52,10 +52,11 @@ public class BasicItemController
 	}
 	
 	@PostMapping("/add")
-	public String save(@ModelAttribute("item") Item item, Model model) 
+	public String save(@ModelAttribute("item") Item item) 
 	{
+		// ModelAttribute의 괄호 안 Name 속성으로 넘겨주는 Model 네이밍 지정 가능
+		// ModelAttribute 어노테이션으로 Model까지 내부적으로 생성하여 집어 넣음 
 		itemRepository.save(item);
-		model.addAttribute("item", item);
 		
 		return "basic/item";
 	}
