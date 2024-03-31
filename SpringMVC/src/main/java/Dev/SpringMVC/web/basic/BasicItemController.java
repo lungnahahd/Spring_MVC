@@ -62,12 +62,19 @@ public class BasicItemController
 	}
 	
 	@GetMapping("/{itemId}/edit")
-	public String edit(@PathVariable(name = "itemId") long itemId, Model model) 
+	public String editForm(@PathVariable(name = "itemId") long itemId, Model model) 
 	{
 		Item item = itemRepository.findById(itemId);
 		model.addAttribute("item", item);
 		
 		return "basic/editForm";
+	}
+	
+	@PostMapping("/{itemId}/edit")
+	public String edit(@PathVariable(name="itemdId") long itemId, @ModelAttribute Item item) 
+	{
+		itemRepository.update(itemId, item);
+		return "redirect:/basci/items/{itemId}";
 	}
 	
 	
