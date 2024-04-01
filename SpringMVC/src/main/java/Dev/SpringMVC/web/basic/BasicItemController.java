@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import Dev.SpringMVC.domain.item.Item;
 import Dev.SpringMVC.domain.item.ItemRepository;
@@ -52,14 +53,17 @@ public class BasicItemController
 	}
 	
 	@PostMapping("/add")
-	public String save(@ModelAttribute("item") Item item) 
+	public String save(@ModelAttribute("item") Item item, RedirectAttributes redirectAttributes) 
 	{
 		// ModelAttribute의 괄호 안 Name 속성으로 넘겨주는 Model 네이밍 지정 가능
 		// ModelAttribute 어노테이션으로 Model까지 내부적으로 생성하여 집어 넣음 
-		itemRepository.save(item);
+		Item savedItem = itemRepository.save(item);
+		redirectAttributes.addAttribute("itemId", savedItem.getId());
+		redirectAttributes.addAttribute("status", true);
+		 
 		
 		// PRG 형식을 지키기 위해 Redirect 리턴으로 형식 변형 
-		return "redirect:/basic/items/" + item.getId();
+		return "redirect:/basic/items/{itemId}";
 		//return "basic/item";
 	}
 	
