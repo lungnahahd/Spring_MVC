@@ -58,7 +58,9 @@ public class BasicItemController
 		// ModelAttribute 어노테이션으로 Model까지 내부적으로 생성하여 집어 넣음 
 		itemRepository.save(item);
 		
-		return "basic/item";
+		// PRG 형식을 지키기 위해 Redirect 리턴으로 형식 변형 
+		return "redirect:/basic/items/" + item.getId();
+		//return "basic/item";
 	}
 	
 	@GetMapping("/{itemId}/edit")
