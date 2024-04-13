@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,13 +53,14 @@ public class BasicItemController
 	}
 	
 	@GetMapping("/add")
-	public String addForm() 
+	public String addForm(Model model) 
 	{
+		model.addAttribute("item", new Item());
 		return "basic/addForm";
 	}
 	
 	@PostMapping("/add")
-	public String save(@ModelAttribute("item") Item item, RedirectAttributes redirectAttributes, Model model) 
+	public String save(@ModelAttribute("item") Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) 
 	{
 		// 검증 오류 보관 
 		Map<String, String> errors = new HashMap<>();
@@ -65,28 +69,33 @@ public class BasicItemController
 		if (!StringUtils.hasText(item.getItemName())) 
 		{
 			errors.put("itemName", "상품 이름은 필수입니다!");
-		}
+			bindingResult.addError(new FieldError("item", "itemName", "상품 이름은 필수입니다!"));
+ 		}
 		if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) 
 		{
 			errors.put("price", "가격은 1,000 ~ 1,000,000 까지 허용합니다.");
+			bindingResult.addError(new FieldError("item", "price", "가격은 필수입니다!"));
 		}
-		if (item.getQuentity() == null || item.getQuentity() >= 9999) 
+		if (item.getQuantity() == null || item.getQuantity() >= 9999) 
 		{
 			errors.put("quantity", "수량은 최대 9,999 까지 허용합니다.");
+			bindingResult.addError(new FieldError("item", "quantity", "수량은 최대 9,999 까지 허용합니다."));
 		}
-		if(item.getPrice() != null && item.getQuentity() != null) 
+		if(item.getPrice() != null && item.getQuantity() != null) 
 		{
-			int resultPrice = item.getPrice() * item.getQuentity();
+			int resultPrice = item.getPrice() * item.getQuantity();
 			if (resultPrice < 10000) 
 			{
-				errors.put("globalError", "가격 * 수량의 합은 10,000원 이상만 허용합니다.");
+				errors.put("globalErrors", "가격 * 수량의 합은 10,000원 이상만 허용합니다.");
+				bindingResult.addError(new ObjectError("item", "가격 * 수량의 합은 10,000원 이상만 허용합니다."));
 			}
 		}
 		
 		// 검증에 실패하면 다시 입력폼으로 돌아가는 로직 
-		if (!errors.isEmpty()) 
+		if (bindingResult.hasErrors()) 
 		{
-			model.addAttribute("errors", errors);
+			// bindingResult 를 사용하면 굳이 모델에 담지 않아도 Spring에서 지원 !
+			//model.addAttribute("errors", bindingResult);
 			return "basic/addForm";
 		}
 		
@@ -99,6 +108,7 @@ public class BasicItemController
 		 
 		
 		// PRG 형식을 지키기 위해 Redirect 리턴으로 형식 변형 
+		// PRG 형식으로 URL이 유지되는 문제 해결  
 		return "redirect:/basic/items/{itemId}";
 		//return "basic/item";
 	}

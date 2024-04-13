@@ -40,7 +40,7 @@ public class ItemRepository
 		Item wantItem = findById(itemId);
 		wantItem.setItemName(updateParam.getItemName());
 		wantItem.setPrice(updateParam.getPrice());
-		wantItem.setQuentity(updateParam.getQuentity());
+		wantItem.setQuantity(updateParam.getQuantity());
 	}
 	
 	// store 비우기 
